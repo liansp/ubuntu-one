@@ -26,8 +26,8 @@ max_peers_seed = 50
 max_uploads = 15
 
 # Global upload and download rate in KiB. "0" for unlimited.
-download_rate = 100
-upload_rate = 100
+download_rate = 200
+upload_rate = 200
 
 # Default directory to save the downloaded torrents.
 directory = /mnt/backup/Torrents/Downloading
@@ -39,14 +39,14 @@ session = /mnt/backup/Torrents/Downloading/rtorrent.session
 
 # Watch a directory for new torrents, and stop those that have been
 # deleted.
-schedule = watch_directory,10,10,"load_start=/mnt/backup/Torrents/TorrentFiles/Auto/*.torrent,d.set_custom2=1"
+schedule = watch_directory,10,10,"load_start=/mnt/backup/Torrents/TorrentFiles/Auto/*.torrent,d.set_custom1=/mnt/backup/Torrents/Complete/,d.set_custom2=1"
 schedule = untied_directory,10,10,stop_untied=
 
 #change rate
 schedule = throttle_1,23:00:00,24:00:00,download_rate=800
 schedule = throttle_2,23:00:00,24:00:00,upload_rate=800
-schedule = throttle_3,07:00:00,24:00:00,download_rate=100
-schedule = throttle_4,07:00:00,24:00:00,upload_rate=100
+schedule = throttle_3,07:00:00,24:00:00,download_rate=200
+schedule = throttle_4,07:00:00,24:00:00,upload_rate=200
 
 # Close torrents when diskspace is low.
 #schedule = low_diskspace,5,60,close_low_diskspace=100M
@@ -61,10 +61,10 @@ schedule = throttle_4,07:00:00,24:00:00,upload_rate=100
 
 # When the torrent finishes, it executes "mv -n <base_path> ~/Download/"
 # and then sets the destination directory to "~/Download/". (0.7.7+)
-on_finished = move_complete,"execute=mv,-u,$d.get_base_path=,/mnt/backup/Torrents/Complete/ ;d.set_directory=/mnt/backup/Torrents/Complete/ ;d.set_custom2="
+system.method.set_key = event.download.finished, move_complete,"d.set_directory=$d.get_custom1= ;execute=mv,-u,$d.get_base_path=,$d.get_custom1= ;d.set_custom2="
 
 # Erase data files when a download is removed that still has custom2 set.
-on_erase = rm_files,"branch=d.get_custom2=,\"execute={rm,-rf,--,$d.get_base_path=}\""
+system.method.set_key = event.download.erased, rm_files,"branch=d.get_custom2=,\"execute={rm,-rf,--,$d.get_base_path=}\""
 
 # The ip address reported to the tracker.
 #ip = 127.0.0.1
