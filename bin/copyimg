@@ -1,0 +1,17 @@
+#!/bin/sh
+
+#Copy all image to current dir
+
+if [ ! "$BUILDDIR" ]; then
+  echo "Couldn't locate the top of the 9615."
+  exit 1
+fi
+
+echo "Copying image ......"
+
+DEPLOY_DIR=$BUILDDIR/tmp-eglibc/deploy/images/9615-cdp
+
+cp -p ${DEPLOY_DIR}/boot-oe-msm9615.img .
+cp -p ${DEPLOY_DIR}/9615-cdp-image-9615-cdp.yaffs2 .
+cp -p ${DEPLOY_DIR}/9615-cdp-usr-image.usrfs.yaffs2 .
+cp -p ${DEPLOY_DIR}/appsboot*.mbn .

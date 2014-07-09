@@ -1,0 +1,3 @@
+#!/bin/sh
+
+autoconf-to-eclipse.py  $OUT/obj/KERNEL_OBJ/include/generated/autoconf.h  $ANDROID_BUILD_TOP/kernel/

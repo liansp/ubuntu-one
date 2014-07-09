@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ -z $1 ]; then
+  echo "Usage: %0 dir"
+  exit
+fi
+
+DEST_DIR="rd-svr:/mnt/data/samba/release/MDM9215"
+rsync -av $1 $DEST_DIR/

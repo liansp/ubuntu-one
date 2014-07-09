@@ -1,0 +1,12 @@
+#!/bin/sh
+
+M="build/target/board/Android.mk"
+if [ -f $M ]; then
+  if [ -z "$1" ] ; then
+     ONE_SHOT_MAKEFILE=$M make kernel
+  else
+     ONE_SHOT_MAKEFILE=$M make $@
+  fi
+else
+  echo "Couldn't find makefile."
+fi

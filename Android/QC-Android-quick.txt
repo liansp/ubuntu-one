@@ -1,0 +1,45 @@
+
+How to develop Qualcomm Android?
+(by SK Shanghai)
+
+1.Setting up a Ubuntu build environment
+-------------------------------------------------------------------------------
+
+see: http://source.android.com/source/initializing.html
+
+2.Get code
+-------------------------------------------------------------------------------
+
+1)Make ssh key, give it to admin
+# ssh-keygen
+
+2)# git clone git@rd-svr:QRD7627A/android.git
+
+3.Build
+-------------------------------------------------------------------------------
+
+1)Go to android top directory
+2)# source build/envsetup.sh
+3)# lunch (select 3)
+4)# make
+
+4.Download
+-------------------------------------------------------------------------------
+
+1)create a file /etc/udev/rules.d/51-android.rules and to copy the following to it.
+
+# adb protocol
+SUBSYSTEM=="usb", ATTR{idVendor}=="<device VID>", ATTR{idProduct}=="<device PID>", MODE="0600", OWNER="<username>"
+# fastboot protocol
+SUBSYSTEM=="usb", ATTR{idVendor}=="<device VID>", ATTR{idProduct}=="<device PID>", MODE="0600", OWNER="<username>"
+
+2)# adb reboot bootloader
+(wait device enter fastboot mode)
+
+3)# fastboot flash boot $OUT/boot.2knand.img
+  # fastboot flash system $OUT/system.2knand.img
+  # fastboot -w
+  # fastboot reboot
+     OR 
+  # flash_android [bootloader|boot|system|all]
+

@@ -1,0 +1,67 @@
+#!/bin/sh
+
+if [ ! "$BUILDDIR" ]; then
+  echo "Couldn't locate the top of the 9615."
+  exit 1
+fi
+
+M_IMG_DIR=$BUILDDIR/tmp-eglibc/deploy/images/9615-cdp
+M_WORK_DIR=$BUILDDIR/tmp-eglibc/work/armv7a-vfp-neon-oe-linux-gnueabi
+
+obj=$1
+case "$obj" in
+  wlan)
+    M_WLAN_DIR="lib/modules/3.0.21/kernel/drivers/net/wireless"
+    adb push $BUILDDIR/tmp-eglibc/sysroots/9615-cdp/${M_WLAN_DIR}/ar6000.ko /usr/${M_WLAN_DIR}
+    ;;
+  wlanmac)
+    if [ -n "$2" ]; then
+      adb push $2 /lib/firmware/ath6k/AR6003/hw2.1.1/softmac
+    fi
+    ;;
+  qcmap)
+    adb push $M_WORK_DIR/data-git-r8/image/usr/bin/QCMAP_ConnectionManager /usr/bin
+    ;;
+  diag)
+    adb push $M_WORK_DIR/diag-git-r6/image/usr/bin/diag_uart_log /usr/bin
+    ;;
+  atfwd)
+    adb push $M_WORK_DIR/atfwd-daemon-git-r1/image/usr/bin/atfwd_daemon /usr/bin
+    ;;
+  key)
+    adb push $M_WORK_DIR/qmi-shutdown-modem-git-r1/image/usr/bin/qmi_shutdown_modem /usr/bin
+    ;;
+  ledd)
+    adb push $M_WORK_DIR/ledd-git-r1/image/usr/bin/ledd /usr/bin
+    ;;
+  ktcmd)
+    adb push $M_WORK_DIR/ktcmd-git-r1/image/usr/bin/ktcmd /usr/bin
+    ;;
+  kiapp)
+    adb push $M_WORK_DIR/kiapp-git-r1/image/usr/bin/qmi_sysinfo /usr/bin
+    ;;
+  aboot)
+    fastboot flash aboot $M_IMG_DIR/appsboot.mbn
+    ;;
+  boot)
+    fastboot flash boot $M_IMG_DIR/boot-oe-msm9615.img
+    fastboot reboot
+    ;;
+  system)
+    fastboot flash system $M_IMG_DIR/9615-cdp-image-9615-cdp.yaffs2
+    fastboot reboot
+    ;;
+  userdata)
+    fastboot flash userdata $M_IMG_DIR/9615-cdp-usr-image.usrfs.yaffs2
+    fastboot reboot
+    ;;
+  all)
+    fastboot flash boot $M_IMG_DIR/boot-oe-msm9615.img
+    fastboot flash system $M_IMG_DIR/9615-cdp-image-9615-cdp.yaffs2
+    fastboot flash userdata $M_IMG_DIR/9615-cdp-usr-image.usrfs.yaffs2
+    fastboot reboot
+    ;;
+  *)
+    echo "Usage: flash_ap.sh [wlan|wlanmac|qcmap|diag|atfwd|key|ledd|ktcmd|kiapp|aboot|boot|system|userdata|all]"
+    ;;
+esac

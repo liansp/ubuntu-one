@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ ! "$BUILDDIR" ]; then
+  echo "Couldn't locate the top of the 9615."
+  exit 1
+fi
+
+if [ -z "$1" ] ; then
+ bitbake -fc compile linux-quic
+else
+ bitbake -fc compile $@
+fi
