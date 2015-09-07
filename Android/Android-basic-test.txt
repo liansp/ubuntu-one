@@ -1,20 +1,23 @@
 
 Android basic test
+==================
 
-1.Make call, receive call
+- Make call, receive call
 
-2.Music
+- Send SMS, receive SMS
 
-3.Video
+- 3G/4G Internet
 
-4.Camera
+- Music
 
-5.WiFi internet
+- Video
 
-6.GPS position
+- Camera
 
-7.3G internet
+- WiFi internet
 
-8.SD card as USB stick, and copy file
+- GPS position
 
-9.Sleep current
+- SD card as USB stick, and copy file
+
+- Sleep current

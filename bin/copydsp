@@ -1,0 +1,19 @@
+#!/bin/sh
+
+#Copy all modem bin to current dir
+
+if [ ! "$BUILDDIR" ]; then
+  echo "Couldn't locate the top of the 9615."
+  exit 1
+fi
+
+echo "Copying modem ......"
+
+ROOT=$BUILDDIR/../../..
+
+cp -p ${ROOT}/mdm9615-le-5-0_device/boot_images/build/ms/bin/ACETRMAZ/*.hex .
+cp -p ${ROOT}/mdm9615-le-5-0_device/boot_images/build/ms/bin/ACETRMAZ/sbl*.mbn .
+cp -p ${ROOT}/mdm9615-le-5-0_device/lpass_proc/obj/qdsp6v4_ReleaseG/dsp3.mbn .
+cp -p ${ROOT}/mdm9615-le-5-0_device/rpm_proc/build/ms/bin/AAAAANAAR/rpm.mbn .
+cp -p ${ROOT}/mdm9615-le-5-0_device/common/build/partition.mbn .
+cp -p ${ROOT}/modem_proc/build/ms/bin/ACETWTBZ/dsp*.mbn .
