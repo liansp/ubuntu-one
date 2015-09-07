@@ -1,4 +1,5 @@
 #!/bin/sh
+#Usage: mmk; mmk kernelclean; mmk kernelconfig
 
 M="build/target/board/Android.mk"
 if [ -f $M ]; then

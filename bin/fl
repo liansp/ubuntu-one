@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ ! "$BUILDDIR" ]; then
+if [ ! "$ARMTOOLS" -a ! "$BUILDDIR" ]; then
   echo "Couldn't locate the top of the 9615."
   exit 1
 fi
@@ -61,7 +61,15 @@ case "$obj" in
     fastboot flash userdata $M_IMG_DIR/9615-cdp-usr-image.usrfs.yaffs2
     fastboot reboot
     ;;
+  dsp2)
+    fastboot flash dsp2 bin/ACETWTBZ/dsp2.mbn
+    fastboot reboot
+    ;;
+  modem)
+    fastboot flash modem bin/asic/NON-HLOS.bin
+    fastboot reboot
+    ;;
   *)
-    echo "Usage: flash_ap.sh [wlan|wlanmac|qcmap|diag|atfwd|key|ledd|ktcmd|kiapp|aboot|boot|system|userdata|all]"
+    echo "Usage: flash_ap.sh [wlan|wlanmac|qcmap|diag|atfwd|key|ledd|ktcmd|kiapp|aboot|boot|system|userdata|all|dsp2|modem]"
     ;;
 esac
