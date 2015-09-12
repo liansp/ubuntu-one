@@ -1,0 +1,30 @@
+#!/bin/sh
+
+#Copy all image to current dir
+
+if [ ! "$TOP" ]; then
+  echo "Couldn't locate the top of the 8909"
+  exit 1
+fi
+
+echo "Copying image ......"
+
+COMMON_DIR=$TOP/../../common/build
+BOOT_DIR=$TOP/../../boot_images/build/ms
+RPM_DIR=$TOP/../../rpm_proc/build/ms
+TZ_DIR=$TOP/../../trustzone_images/build/ms
+
+cp -p ${COMMON_DIR}/bin/asic/sparse_images/* .
+cp -p ${COMMON_DIR}/bin/asic/NON-HLOS.bin .
+cp -p ${COMMON_DIR}/patch0.xml .
+cp -p ${COMMON_DIR}/gpt_main0.bin .
+cp -p ${COMMON_DIR}/gpt_backup0.bin .
+cp -p ${COMMON_DIR}/../tools/sectools/resources/build/sec.dat .
+cp -p ${OUT}/emmc_appsboot.mbn .
+cp -p ${OUT}/boot.img .
+cp -p ${OUT}/recovery.img .
+
+cp -p ${BOOT_DIR}/bin/8909/emmc/unsigned/prog_emmc_firehose_8909_ddr.mbn .
+cp -p ${BOOT_DIR}/bin/8909/emmc/sbl1.mbn .
+cp -p ${RPM_DIR}/bin/8909/pm8909/rpm.mbn .
+cp -p ${TZ_DIR}/bin/MAZAANAA/tz.mbn .
