@@ -1,0 +1,2 @@
+export HEXAGON_ROOT=~/Qualcomm/HEXAGON_Tools
+export ARMTOOLS=RVCT221

@@ -55,21 +55,17 @@ case "$obj" in
     fastboot flash userdata $M_IMG_DIR/9615-cdp-usr-image.usrfs.yaffs2
     fastboot reboot
     ;;
+  dsp2)
+    fastboot flash dsp2 bin/ACETWTBZ/dsp2.mbn
+    fastboot reboot
+    ;;
   all)
     fastboot flash boot $M_IMG_DIR/boot-oe-msm9615.img
     fastboot flash system $M_IMG_DIR/9615-cdp-image-9615-cdp.yaffs2
     fastboot flash userdata $M_IMG_DIR/9615-cdp-usr-image.usrfs.yaffs2
     fastboot reboot
     ;;
-  dsp2)
-    fastboot flash dsp2 bin/ACETWTBZ/dsp2.mbn
-    fastboot reboot
-    ;;
-  modem)
-    fastboot flash modem bin/asic/NON-HLOS.bin
-    fastboot reboot
-    ;;
   *)
-    echo "Usage: flash_ap.sh [wlan|wlanmac|qcmap|diag|atfwd|key|ledd|ktcmd|kiapp|aboot|boot|system|userdata|all|dsp2|modem]"
+    echo "Usage: flash_ap.sh [wlan|wlanmac|qcmap|diag|atfwd|key|ledd|ktcmd|kiapp|aboot|boot|system|userdata|dsp2|all]"
     ;;
 esac

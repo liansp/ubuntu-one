@@ -5,6 +5,8 @@ if [ ! "$ANDROID_BUILD_TOP" ]; then
   exit 1
 fi
 
+COMMON_DIR=$ANDROID_BUILD_TOP/../../common/build
+
 obj=$1
 case "$obj" in
   aboot)
@@ -22,6 +24,10 @@ case "$obj" in
     fastboot flash userdata $ANDROID_PRODUCT_OUT/userdata.img
     fastboot reboot
     ;;
+  modem)
+    fastboot flash modem $COMMON_DIR/bin/asic/NON-HLOS.bin
+    fastboot reboot
+    ;;
   all)
     fastboot flash boot $ANDROID_PRODUCT_OUT/boot.img
     fastboot flash system $ANDROID_PRODUCT_OUT/system.img
@@ -29,6 +35,6 @@ case "$obj" in
     fastboot reboot
     ;;
   *)
-    echo "Usage: flash_ap.sh [aboot|boot|system|userdata|all]"
+    echo "Usage: flash_ap.sh [aboot|boot|system|userdata|modem|all]"
     ;;
 esac
