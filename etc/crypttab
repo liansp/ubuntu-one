@@ -1,0 +1,2 @@
+# <target name>	<source device>		<key file>	<options>
+#cryptdata	/dev/sdb1	/etc/dm-crypt/data-keyfile	luks
