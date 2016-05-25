@@ -1,5 +1,5 @@
 #!/bin/sh
-#Usage: mmk; mmk kernelclean; mmk kernelconfig
+#Usage: mmk; mmk kernelclean; mmk kernelconfig; mmk aboot
 
 M="build/target/board/Android.mk"
 if [ -f $M ]; then

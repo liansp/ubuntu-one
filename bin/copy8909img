@@ -22,6 +22,8 @@ cp -p ${COMMON_DIR}/gpt_backup0.bin .
 cp -p ${COMMON_DIR}/../tools/sectools/resources/build/sec.dat .
 cp -p ${OUT}/emmc_appsboot.mbn .
 cp -p ${OUT}/boot.img .
+cp -p ${OUT}/system.img .
+cp -p ${OUT}/userdata.img .
 cp -p ${OUT}/recovery.img .
 
 cp -p ${BOOT_DIR}/bin/8909/emmc/unsigned/prog_emmc_firehose_8909_ddr.mbn .
