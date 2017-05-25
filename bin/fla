@@ -5,12 +5,37 @@ if [ ! "$ANDROID_BUILD_TOP" ]; then
   exit 1
 fi
 
-COMMON_DIR=$ANDROID_BUILD_TOP/../../common/build
+MSM8909_TOP=$ANDROID_BUILD_TOP/../..
 
 obj=$1
 case "$obj" in
+  sbl1)
+    fastboot flash sbl1 $MSM8909_TOP/boot_images/build/ms/bin/8909/emmc/sbl1.mbn
+    ;;
+  rpm)
+    fastboot flash rpm $MSM8909_TOP/rpm_proc/build/ms/bin/8909/pm8909/rpm.mbn
+    ;;
+  tz)
+    fastboot flash tz $MSM8909_TOP/trustzone_images/build/ms/bin/MAZAANAA/tz.mbn
+    ;;
+  modem)
+    fastboot flash modem $MSM8909_TOP/common/build/bin/asic/NON-HLOS.bin
+    ;;
+  cam)
+    adb push $ANDROID_PRODUCT_OUT/system/vendor/lib/libmmcamera_ov8858_8909.so /system/vendor/lib/
+    ;;
+  ilidrv)
+    adb push $ANDROID_PRODUCT_OUT/system/lib/modules/fb_ili9163.ko /system/lib/modules/
+	;;
+  lcdd)
+    adb push $ANDROID_PRODUCT_OUT/system/bin/lcd-daemon /system/bin/
+	;;
   aboot)
     fastboot flash aboot $ANDROID_PRODUCT_OUT/emmc_appsboot.mbn
+    ;;
+  splash)
+    fastboot flash splash splash.img
+    fastboot reboot
     ;;
   boot)
     fastboot flash boot $ANDROID_PRODUCT_OUT/boot.img
@@ -24,17 +49,16 @@ case "$obj" in
     fastboot flash userdata $ANDROID_PRODUCT_OUT/userdata.img
     fastboot reboot
     ;;
-  modem)
-    fastboot flash modem $COMMON_DIR/bin/asic/NON-HLOS.bin
-    fastboot reboot
-    ;;
   all)
     fastboot flash boot $ANDROID_PRODUCT_OUT/boot.img
     fastboot flash system $ANDROID_PRODUCT_OUT/system.img
     fastboot flash userdata $ANDROID_PRODUCT_OUT/userdata.img
+    fastboot flash cache $ANDROID_PRODUCT_OUT/cache.img
+    fastboot flash persist $ANDROID_PRODUCT_OUT/persist.img
+    fastboot flash recovery $ANDROID_PRODUCT_OUT/recovery.img
     fastboot reboot
     ;;
   *)
-    echo "Usage: flash_ap.sh [aboot|boot|system|userdata|modem|all]"
+    echo "Usage: flash_ap.sh [cam|lcdd|ilidrv|aboot|boot|system|userdata|modem|all]"
     ;;
 esac
