@@ -1,0 +1,55 @@
+#!/bin/sh
+
+if [ ! "$BUILDDIR" ]; then
+  echo "Couldn't locate the top of the 9607"
+  exit 1
+fi
+
+MSM9607_TOP=$BUILDDIR/../../..
+M_IMG_DIR=$BUILDDIR/tmp-glibc/deploy/images/mdm9607
+M_WORK_DIR=$BUILDDIR/tmp-glibc/work/armv7a-vfp-neon-oe-linux-gnueabi
+
+obj=$1
+case "$obj" in
+  qcmap)
+    adb push $M_WORK_DIR/data-git-r8/image/usr/bin/QCMAP_ConnectionManager /usr/bin
+    ;;
+  diag)
+    adb push $M_WORK_DIR/diag-git-r6/image/usr/bin/diag_uart_log /usr/bin
+    ;;
+  atfwd)
+    adb push $M_WORK_DIR/atfwd-daemon-git-r1/image/usr/bin/atfwd_daemon /usr/bin
+    ;;
+  key)
+    adb push $M_WORK_DIR/qmi-shutdown-modem-git-r1/image/usr/bin/qmi_shutdown_modem /usr/bin
+    ;;
+  ledd)
+    adb push $M_WORK_DIR/ledd-git-r1/image/usr/bin/ledd /usr/bin
+    ;;
+  ktcmd)
+    adb push $M_WORK_DIR/ktcmd-git-r1/image/usr/bin/ktcmd /usr/bin
+    ;;
+  aboot)
+    fastboot flash aboot $M_IMG_DIR/appsboot.mbn
+    ;;
+  boot)
+    fastboot flash boot $M_IMG_DIR/mdm9607-boot.img
+    fastboot reboot
+    ;;
+  system)
+    fastboot flash system $M_IMG_DIR/mdm9607-sysfs.ubi
+    fastboot reboot
+    ;;
+  modem)
+    fastboot flash modem $MSM9607_TOP/common/build/NON-HLOS.ubi
+    fastboot reboot
+    ;;
+  all)
+    fastboot flash boot $M_IMG_DIR/mdm9607-boot.img
+    fastboot flash system $M_IMG_DIR/mdm9607-sysfs.ubi
+    fastboot reboot
+    ;;
+  *)
+    echo "Usage: flash_ap.sh [aboot|boot|system|modem|all]"
+    ;;
+esac

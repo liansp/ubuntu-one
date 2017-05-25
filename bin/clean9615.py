@@ -7,7 +7,8 @@ myprjs = ["atfwd-daemon", "busybox", "common", "configdb", "cxm-apps", "data", "
 			"hostap", "initscripts", "ipthdme", "libhardware", "lk", "loc-api", "modem-shutdown", \
 			"powerapp", "qmi", "qmi-framework", "qmi-shutdown-modem", "reboot-daemon", \
             "system-core", "sysinit", "wlan", "wlan-proprietary", \
-			"9615-cdp-image", "base-files", "linux-quic", "sysvinit-inittab"]
+			"9615-cdp-image", "base-files", "linux-quic", "sysvinit-inittab", \
+            "ledd", "kiapp", "alpu", "dataconsume"]
 
 build_dir = os.environ["BUILDDIR"]
 cache_dir = build_dir + "/sstate-cache/"
@@ -18,3 +19,4 @@ for prj in myprjs:
 	print "Remove " + prj
 	for fl in glob.glob("*" + prj + "*"):
 		os.remove(fl)
+print "PLEASE remove tmp dir to rebuild"

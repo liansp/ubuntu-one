@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ ! "$BUILDDIR" ]; then
+  echo "Couldn't locate the top of the 9615."
+  exit 1
+fi
+
+if [ -z "$1" ] ; then
+ bitbake -c cleanall sthttpd haserl webif uci aputil factory ktcmd ledd webui-www cms
+else
+ bitbake -c cleanall $@
+fi
