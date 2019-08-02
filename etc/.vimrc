@@ -136,7 +136,7 @@ set foldcolumn=0
 syntax enable 
 
 try
-    colorscheme desert
+    colorscheme peaksea
 catch
 endtry
 
@@ -170,7 +170,7 @@ set noswapfile
 " => Text, tab and indent related
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Use spaces instead of tabs
-"set expandtab
+set expandtab
 
 " Be smart when using tabs ;)
 set smarttab
@@ -205,8 +205,8 @@ vnoremap <silent> # :call VisualSelection('b', '')<CR>
 "map k gk
 
 " Map <Space> to / (search) and Ctrl-<Space> to ? (backwards search)
-map <space> /
-map <C-space> ?
+"map <space> /
+"map <C-space> ?
 
 " Disable highlight when <leader><cr> is pressed
 map <silent> <leader><cr> :noh<cr>
@@ -227,8 +227,8 @@ map <leader>ba :1,1000 bd!<cr>
 map <leader>tn :tabnew<cr>
 map <leader>to :tabonly<cr>
 map <leader>tc :tabclose<cr>
-map <leader>tm :tabmove 
-map <leader>t<leader> :tabnext 
+map <leader>tm :tabmove<cr>
+map <leader>t<leader> :tabnext<cr>
 
 " Opens a new tab with the current buffer's path
 " Super useful when editing files in the same directory
@@ -260,7 +260,7 @@ set viminfo^=%
 set laststatus=2
 
 " Format the status line
-set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ [Ln:%l\ Col:%c\ lines:%L]
+set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ lines:%L\ \ [Ln:%l\ Col:%c]
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -382,6 +382,8 @@ map <leader>o :BufExplorer<cr>
 " => CTRL-P
 """"""""""""""""""""""""""""""
 let g:ctrlp_working_path_mode = 0
+let g:ctrlp_by_filename = 0
+let g:ctrlp_regexp = 1
 
 let g:ctrlp_map = '<c-f>'
 map <leader>j :CtrlP<cr>
@@ -401,6 +403,11 @@ nnoremap <silent> <F12> :TagbarToggle<CR>
 " => emmet plugin
 """"""""""""""""""""""""""""""
 let g:user_emmet_leader_key='<Tab>'
+
+""""""""""""""""""""""""""""""
+" => easymotion plugin
+""""""""""""""""""""""""""""""
+let g:EasyMotion_leader_key='<Space>'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Helper functions
