@@ -17,18 +17,22 @@ do
         exit 2
     fi
 
-    echo "******** flash userdata image ********"
-    fastboot flash userdata userdata.img
-    if [ $? -ne 0 ]; then
-        echo -e "\033[31m!!! failed to flash userdata !!!\033[0m"
-        exit 2
+    if [ -f userdata.img ]; then
+        echo "******** flash userdata image ********"
+        fastboot flash userdata userdata.img
+        if [ $? -ne 0 ]; then
+            echo -e "\033[31m!!! failed to flash userdata !!!\033[0m"
+            exit 2
+        fi
     fi
 
-    echo "******** flash cache image ********"
-    fastboot flash cache cache.img
-    if [ $? -ne 0 ]; then
-        echo -e "\033[31m!!! failed to flash cache !!!\033[0m"
-        exit 2
+    if [ -f cache.img ]; then
+        echo "******** flash cache image ********"
+        fastboot flash cache cache.img
+        if [ $? -ne 0 ]; then
+            echo -e "\033[31m!!! failed to flash cache !!!\033[0m"
+            exit 2
+        fi
     fi
 
     if [ -f recovery.img ]; then

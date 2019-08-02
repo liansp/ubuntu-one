@@ -30,6 +30,12 @@ case "$obj" in
   lcdd)
     adb push $ANDROID_PRODUCT_OUT/system/bin/lcd-daemon /system/bin/
 	;;
+  lcdapp)
+    adb push $ANDROID_PRODUCT_OUT/system/priv-app/LCDApp/LCDApp.apk /system/priv-app/LCDApp/
+    ;;
+  mifiapp)
+    adb push $ANDROID_PRODUCT_OUT/system/priv-app/MifiApp/MifiApp.apk /system/priv-app/MifiApp/
+    ;;
   aboot)
     fastboot flash aboot $ANDROID_PRODUCT_OUT/emmc_appsboot.mbn
     ;;
@@ -54,11 +60,12 @@ case "$obj" in
     fastboot flash system $ANDROID_PRODUCT_OUT/system.img
     fastboot flash userdata $ANDROID_PRODUCT_OUT/userdata.img
     fastboot flash cache $ANDROID_PRODUCT_OUT/cache.img
-    fastboot flash persist $ANDROID_PRODUCT_OUT/persist.img
     fastboot flash recovery $ANDROID_PRODUCT_OUT/recovery.img
+    fastboot flash persist $ANDROID_PRODUCT_OUT/persist.img
+#    fastboot -w
     fastboot reboot
     ;;
   *)
-    echo "Usage: flash_ap.sh [cam|lcdd|ilidrv|aboot|boot|system|userdata|modem|all]"
+    echo "Usage: flash_ap.sh [cam|lcdd|lcdapp|mifiapp|ilidrv|aboot|boot|system|userdata|modem|all]"
     ;;
 esac

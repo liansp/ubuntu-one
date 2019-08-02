@@ -1,3 +1,0 @@
-#!/bin/sh
-
-javaws ~/bin/androidscreencast/androidscreencast.jnlp

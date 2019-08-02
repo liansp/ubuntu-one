@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#Copy all modem bin to current dir
+
+if [ ! "$BUILDDIR" ]; then
+  echo "Couldn't locate the top of the 9607"
+  exit 1
+fi
+
+echo "Copying modem ......"
+
+ROOT=$BUILDDIR/../../..
+
+cp -p ${ROOT}/modem_proc/build/ms/bin/NON-HLOS*.ubi .

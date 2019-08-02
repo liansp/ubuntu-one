@@ -12,7 +12,7 @@ echo "Copying image ......"
 cp -p ${OUT}/emmc_appsboot.mbn .
 cp -p ${OUT}/boot.img .
 cp -p ${OUT}/system.img .
-cp -p ${OUT}/userdata.img .
 cp -p ${OUT}/recovery.img .
 cp -p ${OUT}/persist.img .
 cp -p ${OUT}/cache.img .
+cp -p ${OUT}/userdata.img .

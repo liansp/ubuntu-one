@@ -1,0 +1,16 @@
+#!/bin/sh
+
+#Copy all image to current dir
+
+if [ ! "$BUILDDIR" ]; then
+  echo "Couldn't locate the top of the 9607"
+  exit 1
+fi
+
+echo "Copying image ......"
+
+DEPLOY_DIR=$BUILDDIR/tmp-glibc/deploy/images/mdm9607
+
+cp -p ${DEPLOY_DIR}/mdm9607-boot*.img .
+cp -p ${DEPLOY_DIR}/mdm9607-sysfs*.ubi .
+cp -p ${DEPLOY_DIR}/appsboot*.mbn .

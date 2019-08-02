@@ -6,7 +6,7 @@ if [ ! "$BUILDDIR" ]; then
 fi
 
 if [ -z "$1" ] ; then
- bitbake -fc compile linux-quic
+ bitbake -fc compile linux-quic && bitbake -fc deploy linux-quic
 else
- bitbake -fc compile $@
+ bitbake -fc compile $@ && bitbake $@
 fi

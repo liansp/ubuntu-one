@@ -5,4 +5,4 @@ if [ ! "$BUILDDIR" ]; then
   exit 1
 fi
 
-bitbake -c cleansstate sthttpd haserl webif uci aputil factory ktcmd ledd webui-www cms
+bitbake -c cleansstate base-files sysvinit sysvinit-inittab data

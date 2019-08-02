@@ -5,29 +5,30 @@ if [ ! "$BUILDDIR" ]; then
   exit 1
 fi
 
-MSM9607_TOP=$BUILDDIR/../../..
+MDM9607_TOP=$BUILDDIR/../../..
 M_IMG_DIR=$BUILDDIR/tmp-glibc/deploy/images/mdm9607
-M_WORK_DIR=$BUILDDIR/tmp-glibc/work/armv7a-vfp-neon-oe-linux-gnueabi
+M_WORK_DIR1=$BUILDDIR/tmp-glibc/work/mdm9607-oe-linux-gnueabi
+M_WORK_DIR2=$BUILDDIR/tmp-glibc/work/armv7a-vfp-neon-oe-linux-gnueabi
 
 obj=$1
 case "$obj" in
-  qcmap)
-    adb push $M_WORK_DIR/data-git-r8/image/usr/bin/QCMAP_ConnectionManager /usr/bin
-    ;;
-  diag)
-    adb push $M_WORK_DIR/diag-git-r6/image/usr/bin/diag_uart_log /usr/bin
-    ;;
   atfwd)
-    adb push $M_WORK_DIR/atfwd-daemon-git-r1/image/usr/bin/atfwd_daemon /usr/bin
+    adb push $M_WORK_DIR1/atfwd-daemon/git-r3/image/usr/bin/atfwd_daemon /usr/bin
     ;;
-  key)
-    adb push $M_WORK_DIR/qmi-shutdown-modem-git-r1/image/usr/bin/qmi_shutdown_modem /usr/bin
+  netd)
+    adb push $M_WORK_DIR2/netd/git-r0/image/usr/bin/netd /usr/bin
     ;;
-  ledd)
-    adb push $M_WORK_DIR/ledd-git-r1/image/usr/bin/ledd /usr/bin
+  netcmd)
+    adb push $M_WORK_DIR2/netd/git-r0/image/usr/bin/netcmd /usr/bin
     ;;
-  ktcmd)
-    adb push $M_WORK_DIR/ktcmd-git-r1/image/usr/bin/ktcmd /usr/bin
+  dtu)
+    adb push $M_WORK_DIR2/dtu/git-r0/image/usr/bin/dtu /usr/bin
+    ;;
+  lwm2msdk)
+    adb push $M_WORK_DIR1/lwm2msdk/1.0-r1/image/usr/lib/liblwm2msdkL.so.0.0.0 /usr/lib
+    ;;
+  alisdk)
+    adb push $M_WORK_DIR2/alisdk/git-0-r1/image/usr/lib/libalisdkL.so.0 /usr/lib
     ;;
   aboot)
     fastboot flash aboot $M_IMG_DIR/appsboot.mbn
@@ -36,12 +37,16 @@ case "$obj" in
     fastboot flash boot $M_IMG_DIR/mdm9607-boot.img
     fastboot reboot
     ;;
+  boot-2k)
+    fastboot flash boot $M_IMG_DIR/mdm9607-boot-2K.img
+    fastboot reboot
+    ;;
   system)
     fastboot flash system $M_IMG_DIR/mdm9607-sysfs.ubi
     fastboot reboot
     ;;
-  modem)
-    fastboot flash modem $MSM9607_TOP/common/build/NON-HLOS.ubi
+  system-2k)
+    fastboot flash system $M_IMG_DIR/mdm9607-sysfs-2K.ubi
     fastboot reboot
     ;;
   all)
@@ -49,7 +54,18 @@ case "$obj" in
     fastboot flash system $M_IMG_DIR/mdm9607-sysfs.ubi
     fastboot reboot
     ;;
+  all-2k)
+    fastboot flash boot $M_IMG_DIR/mdm9607-boot-2K.img
+    fastboot flash system $M_IMG_DIR/mdm9607-sysfs-2K.ubi
+    fastboot reboot
+    ;;
+  modem)
+    fastboot flash modem $MDM9607_TOP/modem_proc/build/ms/bin/NON-HLOS.ubi
+    ;;
+  modem-2k)
+    fastboot flash modem $MDM9607_TOP/modem_proc/build/ms/bin/NON-HLOS-2K.ubi
+    ;;
   *)
-    echo "Usage: flash_ap.sh [aboot|boot|system|modem|all]"
+    echo "Usage: fll [atfwd|netd|dtu|alisdk|lwm2msdk|aboot|boot(-2k)|system(-2k)|all(-2k)|modem(-2k)]"
     ;;
 esac

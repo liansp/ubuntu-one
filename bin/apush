@@ -1,0 +1,3 @@
+#!/bin/sh
+
+adb push $OUT/$1 /$1
