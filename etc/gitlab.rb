@@ -98,6 +98,9 @@ gitlab_rails['gitlab_default_projects_features_container_registry'] = true
 # gitlab_rails['admin_email_worker_cron'] = "0 0 * * 0"
 # gitlab_rails['repository_archive_cache_worker_cron'] = "0 * * * *"
 # gitlab_rails['pages_domain_verification_cron_worker'] = "*/15 * * * *"
+# gitlab_rails['pages_domain_ssl_renewal_cron_worker'] = "*/10 * * * *"
+# gitlab_rails['pages_domain_removal_cron_worker'] = "47 0 * * *"
+# gitlab_rails['schedule_migrate_external_diffs_worker_cron'] = "15 * * * *"
 
 ### Webhook Settings
 ###! Number of seconds to wait for HTTP response after sending webhook HTTP POST
@@ -175,6 +178,7 @@ gitlab_rails['gitlab_default_projects_features_container_registry'] = true
 
 ### External merge request diffs
 # gitlab_rails['external_diffs_enabled'] = false
+# gitlab_rails['external_diffs_when'] = nil
 # gitlab_rails['external_diffs_storage_path'] = "/var/opt/gitlab/gitlab-rails/shared/external-diffs"
 # gitlab_rails['external_diffs_object_store_enabled'] = false
 # gitlab_rails['external_diffs_object_store_direct_upload'] = false
@@ -215,7 +219,7 @@ gitlab_rails['gitlab_default_projects_features_container_registry'] = true
 
 ### GitLab uploads
 ###! Docs: https://docs.gitlab.com/ee/administration/uploads.html
-# gitlab_rails['uploads_storage_path'] = "/var/opt/gitlab/gitlab-rails/public"
+# gitlab_rails['uploads_storage_path'] = "/opt/gitlab/embedded/service/gitlab-rails/public"
 # gitlab_rails['uploads_base_dir'] = "uploads/-/system"
 # gitlab_rails['uploads_object_store_enabled'] = false
 # gitlab_rails['uploads_object_store_direct_upload'] = false
@@ -302,6 +306,7 @@ gitlab_rails['usage_ping_enabled'] = false
 # gitlab_rails['smartcard_enabled'] = false
 # gitlab_rails['smartcard_ca_file'] = "/etc/gitlab/ssl/CA.pem"
 # gitlab_rails['smartcard_client_certificate_required_port'] = 3444
+# gitlab_rails['smartcard_required_for_git_access'] = false
 
 ### OmniAuth Settings
 ###! Docs: https://docs.gitlab.com/ce/integration/omniauth.html
@@ -376,9 +381,9 @@ gitlab_rails['usage_ping_enabled'] = false
 ###! **If you want to use a single non-default directory to store git data use a
 ###!   path that doesn't contain symlinks.**
 git_data_dirs({
-  "default" => {
-    "path" => "/mnt/repo/gitlab"
-   }
+   "default" => {
+     "path" => "/mnt/repo/gitlab"
+    }
 })
 
 ### Gitaly settings
@@ -441,6 +446,11 @@ git_data_dirs({
 # gitlab_rails['initial_root_password'] = "password"
 # gitlab_rails['initial_shared_runners_registration_token'] = "token"
 
+#### Set path to an initial license to be used while bootstrapping GitLab.
+####! **Only applicable on initial setup, future license updations need to be done via UI.
+####! Updating the file specified in this path won't yield any change after the first reconfigure run.
+# gitlab_rails['iniitial_license_file'] = '/etc/gitlab/company.gitlab-license'
+
 #### Enable or disable automatic database migrations
 # gitlab_rails['auto_migrate'] = true
 
@@ -478,6 +488,7 @@ git_data_dirs({
 # gitlab_rails['redis_ssl'] = false
 # gitlab_rails['redis_password'] = nil
 # gitlab_rails['redis_database'] = 0
+# gitlab_rails['redis_enable_client'] = true
 
 #### Redis local UNIX socket (will be disabled if TCP method is used)
 # gitlab_rails['redis_socket'] = "/var/opt/gitlab/redis/redis.socket"
@@ -562,6 +573,7 @@ git_data_dirs({
 # registry['storage_delete_enabled'] = true
 # registry['validation_enabled'] = false
 # registry['autoredirect'] = false
+# registry['compatibility_schema1_enabled'] = false
 
 ### Registry backend storage
 ###! Docs: https://docs.gitlab.com/ce/administration/container_registry.html#container-registry-storage-driver
@@ -592,7 +604,13 @@ git_data_dirs({
 # registry['default_notifications_backoff'] = "1s"
 # registry['default_notifications_headers'] = {}
 
-
+################################################################################
+## Error Reporting and Logging with Sentry
+################################################################################
+# gitlab_rails['sentry_enabled'] = false
+# gitlab_rails['sentry_dsn'] = 'https://<key>@sentry.io/<project>'
+# gitlab_rails['sentry_clientside_dsn'] = 'https://<key>@sentry.io/<project>'
+# gitlab_rails['sentry_environment'] = 'production'
 
 ################################################################################
 ## GitLab Workhorse
@@ -724,7 +742,7 @@ git_data_dirs({
 ################################################################################
 
 # sidekiq['log_directory'] = "/var/log/gitlab/sidekiq"
-# sidekiq['log_format'] = "default"
+# sidekiq['log_format'] = "json"
 # sidekiq['shutdown_timeout'] = 4
 # sidekiq['concurrency'] = 25
 # sidekiq['metrics_enabled'] = true
@@ -743,6 +761,10 @@ git_data_dirs({
 # gitlab_shell['custom_hooks_dir'] = "/opt/gitlab/embedded/service/gitlab-shell/hooks"
 
 # gitlab_shell['auth_file'] = "/var/opt/gitlab/.ssh/authorized_keys"
+
+### Migration to Go feature flags
+###! Docs: https://gitlab.com/gitlab-org/gitlab-shell#migration-to-go-feature-flags
+# gitlab_shell['migration'] = { enabled: true, features: [] }
 
 ### Git trace log file.
 ###! If set, git commands receive GIT_TRACE* environment variables
@@ -997,7 +1019,7 @@ git_data_dirs({
 
 ##! **Recommended by: https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
 ##!                   https://cipherli.st/**
-# nginx['ssl_protocols'] = "TLSv1.1 TLSv1.2"
+# nginx['ssl_protocols'] = "TLSv1.2"
 
 ##! **Recommended in: https://nginx.org/en/docs/http/ngx_http_ssl_module.html**
 # nginx['ssl_session_cache'] = "builtin:1000  shared:SSL:10m"
@@ -1012,6 +1034,9 @@ git_data_dirs({
 ##! Docs: https://docs.gitlab.com/omnibus/settings/nginx.html#setting-http-strict-transport-security
 # nginx['hsts_max_age'] = 31536000
 # nginx['hsts_include_subdomains'] = false
+
+##! Defaults to stripping path information when making cross-origin requests
+# nginx['referrer_policy'] = 'strict-origin-when-cross-origin'
 
 ##! **Docs: http://nginx.org/en/docs/http/ngx_http_gzip_module.html**
 # nginx['gzip_enabled'] = true
@@ -1099,6 +1124,7 @@ git_data_dirs({
 # logging['svlogd_udp'] = nil # transmit log messages via UDP
 # logging['svlogd_prefix'] = nil # custom prefix for log messages
 # logging['logrotate_frequency'] = "daily" # rotate logs daily
+# logging['logrotate_maxsize'] = nil # rotate logs when they grow bigger than size bytes even before the specified time interval (daily, weekly, monthly, or yearly)
 # logging['logrotate_size'] = nil # do not rotate by size by default
 # logging['logrotate_rotate'] = 30 # keep 30 rotated logs
 # logging['logrotate_compress'] = "compress" # see 'man logrotate'
@@ -1184,6 +1210,9 @@ git_data_dirs({
 ##! Configure to expose GitLab Pages on external IP address, serving the HTTPS
 # gitlab_pages['external_https'] = []
 
+##! Configure to use the default list of cipher suites
+# gitlab_pages['insecure_ciphers'] = false
+
 ##! Configure to enable health check endpoint on GitLab Pages
 # gitlab_pages['status_uri'] = "/@status"
 
@@ -1197,8 +1226,16 @@ git_data_dirs({
 ##! Configure verbose logging for GitLab Pages
 # gitlab_pages['log_verbose'] = false
 
+##! Error Reporting and Logging with Sentry
+# gitlab_pages['sentry_enabled'] = false
+# gitlab_pages['sentry_dsn'] = 'https://<key>@sentry.io/<project>'
+# gitlab_pages['sentry_environment'] = 'production'
+
 ##! Listen for requests forwarded by reverse proxy
 # gitlab_pages['listen_proxy'] = "localhost:8090"
+
+##! Configure GitLab Pages to use an HTTP Proxy
+# gitlab_pages['http_proxy'] = "http://example:8080"
 
 # gitlab_pages['redirect_http'] = true
 # gitlab_pages['use_http2'] = true
@@ -1216,6 +1253,12 @@ git_data_dirs({
 ##! Prometheus metrics for Pages docs: https://gitlab.com/gitlab-org/gitlab-pages/#enable-prometheus-metrics
 # gitlab_pages['metrics_address'] = ":9235"
 
+##! Specifies the minimum SSL/TLS version ("ssl3", "tls1.0", "tls1.1" or "tls1.2")
+# gitlab_pages['tls_min_version'] = "ssl3"
+
+##! Specifies the maximum SSL/TLS version ("ssl3", "tls1.0", "tls1.1" or "tls1.2")
+# gitlab_pages['tls_max_version'] = "tls1.2"
+
 ##! Configure the pages admin API
 # gitlab_pages['admin_secret_token'] = 'custom secret'
 # gitlab_pages['admin_https_listener'] = '0.0.0.0:5678'
@@ -1231,7 +1274,7 @@ git_data_dirs({
 # gitlab_pages['gitlab_id'] = nil # Automatically generated if not present
 # gitlab_pages['gitlab_secret'] = nil # Generated if not present
 # gitlab_pages['auth_redirect_uri'] = nil # Defaults to projects subdomain of pages_external_url and + '/auth'
-# gitlab_pages['auth_server'] = nil # Defaults to external_url
+# gitlab_pages['gitlab_server'] = nil # Defaults to external_url
 # gitlab_pages['auth_secret'] = nil # Generated if not present
 
 ################################################################################
@@ -1347,6 +1390,11 @@ git_data_dirs({
 ##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/
 ################################################################################
 
+###! **To enable only Monitoring service in this machine, uncomment
+###!   the line below.**
+###! Docs: https://docs.gitlab.com/ce/administration/high_availability
+# monitoring_role['enable'] = true
+
 # prometheus['enable'] = true
 # prometheus['monitor_kubernetes'] = true
 # prometheus['username'] = 'gitlab-prometheus'
@@ -1359,7 +1407,6 @@ git_data_dirs({
 # prometheus['rules_files'] = ['/var/opt/gitlab/prometheus/rules/*.rules']
 # prometheus['scrape_interval'] = 15
 # prometheus['scrape_timeout'] = 15
-# prometheus['chunk_encoding_version'] = 2
 # prometheus['env_directory'] = '/opt/gitlab/etc/prometheus/env'
 # prometheus['env'] = {
 #   'SSL_CERT_DIR' => "/opt/gitlab/embedded/ssl/certs/"
@@ -1383,23 +1430,29 @@ git_data_dirs({
 #   },
 # ]
 #
-### Prometheus Memory Management
+### Custom alertmanager config
 #
-# Prometheus needs to be configured for how much memory is used.
-# * This sets the target heap size.
-# * This value accounts for approximately 2/3 of the memory used by the server.
-# * The recommended memory is 4kb per unique metrics time-series.
-# See: https://prometheus.io/docs/operating/storage/#memory-usage
+# To configure external alertmanagers, create an alertmanager config.
 #
-# prometheus['target_heap_size'] = (
-#   # Use 25mb + 2% of total memory for Prometheus memory.
-#   26_214_400 + (node['memory']['total'].to_i * 1024 * 0.02 )
-# ).to_i
+# See: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#alertmanager_config
+#
+# prometheus['alertmanagers'] = [
+#   {
+#     'static_configs' => [
+#       {
+#         'targets' => [
+#           'hostname:port'
+#         ]
+#       }
+#     ]
+#   }
+# ]
+#
+### Custom Prometheus flags
 #
 # prometheus['flags'] = {
-#   'storage.local.path' => "#{node['gitlab']['prometheus']['home']}/data",
-#   'storage.local.chunk-encoding-version' => user_config['chunk-encoding-version'],
-#   'storage.local.target-heap-size' => node['gitlab']['prometheus']['target-heap-size'],
+#   'storage.tsdb.path' => "#{node['gitlab']['prometheus']['home']}/data",
+#   'storage.tsdb.retention.time' => "15d",
 #   'config.file' => "#{node['gitlab']['prometheus']['home']}/prometheus.yml"
 # }
 
@@ -1408,7 +1461,6 @@ git_data_dirs({
 
 ################################################################################
 ## Prometheus Alertmanager
-##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/alertmanager.html
 ################################################################################
 
 # alertmanager['enable'] = true
@@ -1515,6 +1567,64 @@ git_data_dirs({
 # prometheus_monitoring['enable'] = true
 
 ################################################################################
+## Grafana Dashboards
+##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/#prometheus-as-a-grafana-data-source
+################################################################################
+
+# grafana['enable'] = true
+# grafana['log_directory'] = '/var/log/gitlab/grafana'
+# grafana['home'] = '/var/opt/gitlab/grafana'
+# grafana['admin_password'] = 'admin'
+# grafana['allow_user_sign_up'] = false
+# grafana['gitlab_application_id'] = 'GITLAB_APPLICATION_ID'
+# grafana['gitlab_secret'] = 'GITLAB_SECRET'
+# grafana['env_directory'] = '/opt/gitlab/etc/grafana/env'
+# grafana['allowed_groups'] = []
+# grafana['gitlab_auth_sign_up'] = true
+# grafana['env'] = {
+#   'SSL_CERT_DIR' => "#{node['package']['install-dir']}/embedded/ssl/certs/"
+# }
+
+### Dashboards
+#
+# See: http://docs.grafana.org/administration/provisioning/#dashboards
+#
+# NOTE: Setting this will override the default.
+#
+# grafana['dashboards'] = [
+#   {
+#     'name' => 'GitLab Omnibus',
+#     'orgId' => 1,
+#     'folder' => 'GitLab Omnibus',
+#     'type' => 'file',
+#     'disableDeletion' => true,
+#     'updateIntervalSeconds' => 600,
+#     'options' => {
+#       'path' => '/opt/gitlab/embedded/service/grafana-dashboards',
+#     }
+#   }
+# ]
+
+### Datasources
+#
+# See: http://docs.grafana.org/administration/provisioning/#example-datasource-config-file
+#
+# NOTE: Setting this will override the default.
+#
+# grafana['datasources'] = [
+#   {
+#     'name' => 'GitLab Omnibus',
+#     'type' => 'prometheus',
+#     'access' => 'proxy',
+#     'url' => 'http://localhost:9090'
+#   }
+# ]
+
+##! Advanced settings. Should be changed only if absolutely needed.
+# grafana['http_addr'] = 'localhost'
+# grafana['http_port'] = 3000
+
+################################################################################
 ## Gitaly
 ##! Docs:
 ################################################################################
@@ -1540,9 +1650,12 @@ git_data_dirs({
 # gitaly['logging_format'] = "json"
 # gitaly['logging_sentry_dsn'] = "https://<key>:<secret>@sentry.io/<project>"
 # gitaly['logging_ruby_sentry_dsn'] = "https://<key>:<secret>@sentry.io/<project>"
+# gitaly['logging_sentry_environment'] = "production"
 # gitaly['prometheus_grpc_latency_buckets'] = "[0.001, 0.005, 0.025, 0.1, 0.5, 1.0, 10.0, 30.0, 60.0, 300.0, 1500.0]"
 # gitaly['auth_token'] = '<secret>'
 # gitaly['auth_transitioning'] = false # When true, auth is logged to Prometheus but NOT enforced
+# gitaly['graceful_restart_timeout'] = '1m' # Grace time for a gitaly process to finish ongoing requests
+# gitaly['git_catfile_cache_size'] = 100 # Number of 'git cat-file' processes kept around for re-use
 # gitaly['ruby_max_rss'] = 300000000 # RSS threshold in bytes for triggering a gitaly-ruby restart
 # gitaly['ruby_graceful_restart_timeout'] = '10m' # Grace time for a gitaly-ruby process to finish ongoing requests
 # gitaly['ruby_restart_delay'] = '5m' # Period of sustained high RSS that needs to be observed before restarting gitaly-ruby
@@ -1588,6 +1701,10 @@ git_data_dirs({
 # letsencrypt['auto_renew_hour'] = 0
 # letsencrypt['auto_renew_minute'] = nil # Should be a number or cron expression, if specified.
 # letsencrypt['auto_renew_day_of_month'] = "*/4"
+
+##! Turn off automatic init system detection. To skip init detection in
+##! non-docker containers. Recommended not to change.
+# package['detect_init'] = true
 
 ################################################################################
 ################################################################################
@@ -1636,6 +1753,30 @@ git_data_dirs({
 # gitlab_rails['packages_object_store_proxy_download'] = false
 # gitlab_rails['packages_object_store_remote_directory'] = "packages"
 # gitlab_rails['packages_object_store_connection'] = {
+#   'provider' => 'AWS',
+#   'region' => 'eu-west-1',
+#   'aws_access_key_id' => 'AWS_ACCESS_KEY_ID',
+#   'aws_secret_access_key' => 'AWS_SECRET_ACCESS_KEY',
+#   # # The below options configure an S3 compatible host instead of AWS
+#   # 'host' => 's3.amazonaws.com',
+#   # 'aws_signature_version' => 4, # For creation of signed URLs. Set to 2 if provider does not support v4.
+#   # 'endpoint' => 'https://s3.amazonaws.com', # default: nil - Useful for S3 compliant services such as DigitalOcean Spaces
+#   # 'path_style' => false # Use 'host/bucket_name/object' instead of 'bucket_name.host/object'
+# }
+
+################################################################################
+## Dependency proxy (EE Only)
+##! Docs: https://docs.gitlab.com/ee/administration/dependency_proxy.md
+################################################################################
+
+# gitlab_rails['dependency_proxy_enabled'] = true
+# gitlab_rails['dependency_proxy_storage_path'] = "/var/opt/gitlab/gitlab-rails/shared/dependency_proxy"
+# gitlab_rails['dependency_proxy_object_store_enabled'] = false
+# gitlab_rails['dependency_proxy_object_store_direct_upload'] = false
+# gitlab_rails['dependency_proxy_object_store_background_upload'] = true
+# gitlab_rails['dependency_proxy_object_store_proxy_download'] = false
+# gitlab_rails['dependency_proxy_object_store_remote_directory'] = "dependency_proxy"
+# gitlab_rails['dependency_proxy_object_store_connection'] = {
 #   'provider' => 'AWS',
 #   'region' => 'eu-west-1',
 #   'aws_access_key_id' => 'AWS_ACCESS_KEY_ID',
@@ -1757,6 +1898,13 @@ git_data_dirs({
 # geo_primary_role['enable'] = false
 # geo_secondary_role['enable'] = false
 
+# This is an optional identifier which Geo nodes can use to identify themselves.
+# For example, if external_url is the same for two secondaries, you must specify
+# a unique Geo node name for those secondaries.
+#
+# If it is blank, it defaults to external_url.
+# gitlab_rails['geo_node_name'] = nil
+
 ################################################################################
 ## GitLab Geo Secondary (EE only)
 ################################################################################
@@ -1787,6 +1935,8 @@ git_data_dirs({
 # geo_postgresql['data_dir'] = '/var/opt/gitlab/geo-postgresql/data'
 # geo_postgresql['pgbouncer_user'] = nil
 # geo_postgresql['pgbouncer_user_password'] = nil
+##! `SQL_USER_PASSWORD_HASH` can be generated using the command `gitlab-ctl pg-password-md5 gitlab`
+# geo_postgresql['sql_user_password'] = 'SQL_USER_PASSWORD_HASH'
 
 ################################################################################
 # Pgbouncer (EE only)
@@ -1960,6 +2110,7 @@ git_data_dirs({
 # consul['env'] = {
 #   'SSL_CERT_DIR' => "/opt/gitlab/embedded/ssl/certs/"
 # }
+# consul['monitoring_service_discovery'] = false
 # consul['node_name'] = nil
 # consul['script_directory'] = '/var/opt/gitlab/consul/scripts'
 # consul['configuration'] = {
